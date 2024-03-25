@@ -14,3 +14,6 @@ services:
         target: /app
         bind:
           create_host_path: true
+    environment:
+      SECRET_KEY: django-insecure-q7r1r^3_#xp2sp+p=tyn=$s=7!s-i3v%q902b9h@ha64&gk8u&
+      DEBUG: True
