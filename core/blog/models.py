@@ -1,6 +1,11 @@
 from django.db import models
 from django.utils.text import slugify
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+
+# To get User model object: use USER_AUTH_MODEL from settings
+# or import User model directly from accounts app
+# but below way is more efficient since it's more dynamic
+User = get_user_model()
 
 
 # Create your models here.
