@@ -1,9 +1,13 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from accounts.models import User
+from accounts.models import User, Profile
 
 
 # Register your models here.
+
+admin.site.register(Profile)
+
+
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
     model = User
@@ -34,9 +38,7 @@ class CustomUserAdmin(UserAdmin):
         (
             "Important Dates",
             {
-                "fields": (
-                    "last_login",
-                ),
+                "fields": ("last_login",),
             },
         ),
     )
@@ -57,4 +59,4 @@ class CustomUserAdmin(UserAdmin):
         ),
     )
     search_fields = ("email",)
-    ordering = ("email", )
+    ordering = ("email",)
