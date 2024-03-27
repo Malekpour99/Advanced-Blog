@@ -43,9 +43,3 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
-
-    def save(self, *args, **kwargs):
-        # Generating slug from the name if it was not already generated
-        if not self.slug:
-            self.slug = slugify(self.name)
-        super().save(*args, **kwargs)
