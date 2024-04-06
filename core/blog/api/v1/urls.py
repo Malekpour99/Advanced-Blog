@@ -4,6 +4,6 @@ from . import views
 app_name = "api-v1"
 
 urlpatterns = [
-    path("", views.api_rest_view, name="test"),
+    path("posts", views.post_list, name="post-list"),
     path("post/<int:id>/", views.post_detail, name="post-detail"),
 ]
