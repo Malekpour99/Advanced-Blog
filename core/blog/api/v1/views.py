@@ -7,8 +7,10 @@ from django.shortcuts import get_object_or_404
 
 
 @api_view()
-def api_rest_view(request):
-    return Response("ok")
+def post_list(request):
+    posts = Post.objects.filter(published=True)
+    serializer = PostSerializer(posts, many=True)
+    return Response(serializer.data)
 
 
 # @api_view()
@@ -22,7 +24,8 @@ def api_rest_view(request):
 #         return Response(
 #             {"detail": "Post does not exist"}, status=status.HTTP_404_NOT_FOUND
 #         )
-        
+
+
 # You can summarize above code like below:
 @api_view()
 def post_detail(request, id):
