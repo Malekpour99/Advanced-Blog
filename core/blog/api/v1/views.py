@@ -29,6 +29,6 @@ def post_list(request):
 # You can summarize above code like below:
 @api_view()
 def post_detail(request, id):
-    post = get_object_or_404(Post, pk=id)
+    post = get_object_or_404(Post, pk=id, published=True)
     serializer = PostSerializer(post)
     return Response(serializer.data)
