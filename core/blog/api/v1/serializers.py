@@ -13,6 +13,7 @@ class PostSerializer(serializers.ModelSerializer):
         # don't use __all__ for fields (best practice)
         fields = [
             "id",
+            "author",
             "title",
             "content",
             "published",
