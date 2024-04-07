@@ -13,12 +13,16 @@ def post_list(request):
         serializer = PostSerializer(posts, many=True)
         return Response(serializer.data)
     elif request.method == "POST":
-        serializer = PostSerializer(data=request.data)
         # you must specify 'data' since is_valid() will look for it
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors)
+        serializer = PostSerializer(data=request.data)
+        # if serializer.is_valid():
+        #     serializer.save()
+        #     return Response(serializer.data)
+        # else:
+        #     return Response(serializer.errors)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
 
 # @api_view()
