@@ -1,5 +1,10 @@
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import (
+    IsAuthenticated,
+    IsAdminUser,
+    IsAuthenticatedOrReadOnly,
+)
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from blog.models import Post
 from .serializers import PostSerializer
@@ -27,17 +32,34 @@ def post_list(request):
         return Response(serializer.data)
 
 
-# @api_view()
-# def post_detail(request, id):
-#     try:
-#         post = Post.objects.get(pk=id)
-#         serializer = PostSerializer(post)
-#         return Response(serializer.data)
-#     except Post.DoesNotExist:
-#         # return Response({"detail": "Post does not exist"}, status=404)
-#         return Response(
-#             {"detail": "Post does not exist"}, status=status.HTTP_404_NOT_FOUND
-#         )
+class PostList(APIView):
+    """Retrieving and creating posts"""
+
+    def get(self, request):
+        """Get a list of posts"""
+        posts = Post.objects.filter(published=True)
+        serializer = PostSerializer(posts, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        """Create a new post from provided data"""
+        serializer = PostSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+
+"""@api_view()
+def post_detail(request, id):
+    try:
+        post = Post.objects.get(pk=id)
+        serializer = PostSerializer(post)
+        return Response(serializer.data)
+    except Post.DoesNotExist:
+        # return Response({"detail": "Post does not exist"}, status=404)
+        return Response(
+            {"detail": "Post does not exist"}, status=status.HTTP_404_NOT_FOUND
+        )"""
 
 
 # You can summarize above code like below:
