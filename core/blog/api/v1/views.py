@@ -12,6 +12,7 @@ from rest_framework import status
 from django.shortcuts import get_object_or_404
 
 
+# Function Based Views --------------------------------
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticatedOrReadOnly])
 def post_list(request):
@@ -27,25 +28,6 @@ def post_list(request):
         #     return Response(serializer.data)
         # else:
         #     return Response(serializer.errors)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
-
-
-class PostList(APIView):
-    """Retrieving and creating posts"""
-    permission_classes = [IsAuthenticatedOrReadOnly]
-    serializer_class = PostSerializer
-
-    def get(self, request):
-        """Get a list of posts"""
-        posts = Post.objects.filter(published=True)
-        serializer = PostSerializer(posts, many=True)
-        return Response(serializer.data)
-
-    def post(self, request):
-        """Create a new post from provided data"""
-        serializer = PostSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
@@ -78,6 +60,56 @@ def post_detail(request, id):
         serializer.save()
         return Response(serializer.data)
     elif request.method == "DELETE":
+        post.delete()
+        return Response(
+            {"detail": "Item removed successfully."}, status=status.HTTP_204_NO_CONTENT
+        )
+
+
+# Class Based Views --------------------------------
+class PostList(APIView):
+    """Retrieving and creating posts"""
+
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    serializer_class = PostSerializer
+
+    def get(self, request):
+        """Get a list of posts"""
+        posts = Post.objects.filter(published=True)
+        serializer = PostSerializer(posts, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        """Create a new post from provided data"""
+        serializer = PostSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+
+class PostSingle(APIView):
+    """Retrieving, Updating and Deleting a single post"""
+
+    permission_classes = [IsAdminUser]
+    serializer_class = PostSerializer
+
+    def get(self, request, id):
+        """Retrieve a single post"""
+        post = get_object_or_404(Post, pk=id, published=True)
+        serializer = self.serializer_class(post)
+        return Response(serializer.data)
+
+    def put(self, request, id):
+        """Edit/Update a single post"""
+        post = get_object_or_404(Post, pk=id, published=True)
+        serializer = self.serializer_class(post, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    def delete(self, request, id):
+        """Delete a single post"""
+        post = get_object_or_404(Post, pk=id, published=True)
         post.delete()
         return Response(
             {"detail": "Item removed successfully."}, status=status.HTTP_204_NO_CONTENT
