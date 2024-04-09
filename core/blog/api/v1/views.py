@@ -35,6 +35,7 @@ def post_list(request):
 class PostList(APIView):
     """Retrieving and creating posts"""
     permission_classes = [IsAuthenticatedOrReadOnly]
+    serializer_class = PostSerializer
 
     def get(self, request):
         """Get a list of posts"""
