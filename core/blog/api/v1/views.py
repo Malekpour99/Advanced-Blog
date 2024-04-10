@@ -135,7 +135,7 @@ class PostList(ListCreateAPIView):
     queryset = Post.objects.filter(published=True)
 
 
-class PostSingle(APIView):
+'''class PostSingle(APIView):
     """Retrieving, Updating and Deleting a single post"""
 
     permission_classes = [IsAdminUser]
@@ -161,4 +161,31 @@ class PostSingle(APIView):
         post.delete()
         return Response(
             {"detail": "Item removed successfully."}, status=status.HTTP_204_NO_CONTENT
-        )
+        )'''
+
+
+class PostSingle(
+    GenericAPIView,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.DestroyModelMixin,
+):
+    """Retrieving, Updating and Deleting a single post"""
+
+    permission_classes = [IsAdminUser]
+    serializer_class = PostSerializer
+    queryset = Post.objects.filter(published=True)
+    # we changed 'id' to 'pk' for retrieving post object but if
+    # you want to use a different field override the 'lookup_field' attribute
+
+    def get(self, request, *args, **kwargs):
+        """Retrieve a single post"""
+        return self.retrieve(request, *args, **kwargs)
+
+    def put(self, request, *args, **kwargs):
+        """Edit/Update a single post"""
+        return self.update(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        """Delete a single post"""
+        return self.destroy(request, *args, **kwargs)
