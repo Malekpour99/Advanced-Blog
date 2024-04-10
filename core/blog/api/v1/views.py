@@ -12,6 +12,7 @@ from rest_framework.generics import (
     RetrieveUpdateDestroyAPIView,
 )
 from rest_framework import mixins
+from rest_framework import viewsets
 from blog.models import Post
 from .serializers import PostSerializer
 from rest_framework import status
@@ -201,3 +202,56 @@ class PostSingle(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAdminUser]
     serializer_class = PostSerializer
     queryset = Post.objects.filter(published=True)
+
+
+class PostViewSet(viewsets.ViewSet):
+    """
+    Retrieving posts and creating a post
+    Retrieving, Updating and Deleting a single post
+    """
+
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    serializer_class = PostSerializer
+    queryset = Post.objects.filter(published=True)
+
+    def list(self, request):
+        """Returning a list of posts"""
+        serializer = self.serializer_class(self.queryset, many=True)
+        return Response(serializer.data)
+
+    def create(self, request):
+        """Creating a new post"""
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk):
+        """Retrieving a single post"""
+        post_object = get_object_or_404(self.queryset, pk=pk)
+        serializer = self.serializer_class(post_object)
+        return Response(serializer.data)
+
+    def update(self, request, pk):
+        """Updating a single post completely"""
+        post_object = get_object_or_404(self.queryset, pk=pk)
+        serializer = self.serializer_class(post_object, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    def partial_update(self, request, pk):
+        """Updating a single post Partially"""
+        post_object = get_object_or_404(self.queryset, pk=pk)
+        serializer = self.serializer_class(post_object, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    def destroy(self, request, pk):
+        """Deleting a single post"""
+        post_object = get_object_or_404(self.queryset, pk=pk)
+        post_object.delete()
+        return Response(
+            {"detail": "Item removed successfully."}, status=status.HTTP_204_NO_CONTENT
+        )
