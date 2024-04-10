@@ -6,6 +6,7 @@ from rest_framework.permissions import (
 )
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.generics import GenericAPIView
 from blog.models import Post
 from .serializers import PostSerializer
 from rest_framework import status
@@ -67,7 +68,7 @@ def post_detail(request, id):
 
 
 # Class Based Views --------------------------------
-class PostList(APIView):
+'''class PostList(APIView):
     """Retrieving and creating posts"""
 
     permission_classes = [IsAuthenticatedOrReadOnly]
@@ -82,6 +83,28 @@ class PostList(APIView):
     def post(self, request):
         """Create a new post from provided data"""
         serializer = PostSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)'''
+
+
+class PostList(GenericAPIView):
+    """Retrieving and creating posts"""
+
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    serializer_class = PostSerializer
+    queryset = Post.objects.filter(published=True)
+
+    def get(self, request):
+        """Get a list of posts"""
+        # You must call get_queryset() when overriding a method since queryset is cached
+        queryset = self.get_queryset()
+        serializer = self.serializer_class(queryset, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        """Create a new post from provided data"""
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
