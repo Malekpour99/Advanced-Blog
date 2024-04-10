@@ -6,7 +6,11 @@ from rest_framework.permissions import (
 )
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.generics import GenericAPIView, ListCreateAPIView
+from rest_framework.generics import (
+    GenericAPIView,
+    ListCreateAPIView,
+    RetrieveUpdateDestroyAPIView,
+)
 from rest_framework import mixins
 from blog.models import Post
 from .serializers import PostSerializer
@@ -164,7 +168,7 @@ class PostList(ListCreateAPIView):
         )'''
 
 
-class PostSingle(
+'''class PostSingle(
     GenericAPIView,
     mixins.RetrieveModelMixin,
     mixins.UpdateModelMixin,
@@ -188,4 +192,12 @@ class PostSingle(
 
     def delete(self, request, *args, **kwargs):
         """Delete a single post"""
-        return self.destroy(request, *args, **kwargs)
+        return self.destroy(request, *args, **kwargs)'''
+
+
+class PostSingle(RetrieveUpdateDestroyAPIView):
+    """Retrieving, Updating and Deleting a single post"""
+
+    permission_classes = [IsAdminUser]
+    serializer_class = PostSerializer
+    queryset = Post.objects.filter(published=True)
