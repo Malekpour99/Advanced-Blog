@@ -206,7 +206,7 @@ class PostSingle(RetrieveUpdateDestroyAPIView):
 
 class PostViewSet(viewsets.ViewSet):
     """
-    Retrieving posts and creating a post
+    Retrieving posts and creating a post \n
     Retrieving, Updating and Deleting a single post
     """
 
