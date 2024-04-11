@@ -13,8 +13,8 @@ from rest_framework.generics import (
 )
 from rest_framework import mixins
 from rest_framework import viewsets
-from blog.models import Post
-from .serializers import PostSerializer
+from blog.models import Post, Category
+from .serializers import PostSerializer, CategorySerializer
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 
@@ -266,3 +266,14 @@ class PostModelViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
     serializer_class = PostSerializer
     queryset = Post.objects.filter(published=True)
+
+
+class CategoryModelViewSet(viewsets.ModelViewSet):
+    """
+    Retrieving category and creating a category \n
+    Retrieving, Updating and Deleting a single category
+    """
+
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    serializer_class = CategorySerializer
+    queryset = Category.objects.all()
