@@ -255,3 +255,14 @@ class PostViewSet(viewsets.ViewSet):
         return Response(
             {"detail": "Item removed successfully."}, status=status.HTTP_204_NO_CONTENT
         )
+
+
+class PostModelViewSet(viewsets.ModelViewSet):
+    """
+    Retrieving posts and creating a post \n
+    Retrieving, Updating and Deleting a single post
+    """
+
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    serializer_class = PostSerializer
+    queryset = Post.objects.filter(published=True)
