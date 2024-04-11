@@ -13,6 +13,7 @@ from rest_framework.generics import (
 )
 from rest_framework import mixins
 from rest_framework import viewsets
+from rest_framework.decorators import action
 from blog.models import Post, Category
 from .serializers import PostSerializer, CategorySerializer
 from rest_framework import status
@@ -266,6 +267,11 @@ class PostModelViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
     serializer_class = PostSerializer
     queryset = Post.objects.filter(published=True)
+
+    @action(methods=["get"], detail=False)
+    def get_ok(self, request):
+        """A custom action for test"""
+        return Response({"detail": "OK"})
 
 
 class CategoryModelViewSet(viewsets.ModelViewSet):
