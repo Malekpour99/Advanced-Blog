@@ -4,7 +4,8 @@ from rest_framework.routers import DefaultRouter
 
 app_name = "api-v1"
 
-
+# You can also use SimpleRouter but SimpleRouter is more basic and won't provide
+# an API root and schema for you
 router = DefaultRouter()
 router.register("post", views.PostModelViewSet, basename="post")
 router.register("category", views.CategoryModelViewSet, basename="category")
