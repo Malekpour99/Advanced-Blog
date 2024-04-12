@@ -30,6 +30,8 @@ class Post(models.Model):
     def __str__(self):
         return f"{self.title} - {self.id}"
 
+    def get_snippet(self):
+        return self.content[0:10]
 
 
 class Category(models.Model):
