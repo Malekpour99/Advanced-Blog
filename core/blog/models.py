@@ -1,5 +1,5 @@
 from django.db import models
-from django.utils.text import slugify
+from django.urls import reverse
 from django.contrib.auth import get_user_model
 
 # To get User model object: use USER_AUTH_MODEL from settings
@@ -32,6 +32,9 @@ class Post(models.Model):
 
     def get_snippet(self):
         return self.content[0:10]
+
+    def get_relative_api_url(self):
+        return reverse("blog:api-v1:post-detail", kwargs={"pk": self.pk})
 
 
 class Category(models.Model):
