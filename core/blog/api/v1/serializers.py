@@ -8,6 +8,8 @@ from blog.models import Post, Category
 
 
 class PostSerializer(serializers.ModelSerializer):
+    snippet = serializers.ReadOnlyField(source="get_snippet")
+
     class Meta:
         model = Post
         # don't use __all__ for fields (best practice)
@@ -16,6 +18,7 @@ class PostSerializer(serializers.ModelSerializer):
             "author",
             "title",
             "content",
+            "snippet",
             "published",
             "published_date",
             "created_date",
