@@ -7,10 +7,21 @@ from blog.models import Post, Category
 #     title = serializers.CharField(max_length=255)
 
 
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        # don't use __all__ for fields (best practice)
+        fields = ["id", "name"]
+
+
 class PostSerializer(serializers.ModelSerializer):
     snippet = serializers.ReadOnlyField(source="get_snippet")
     relative_url = serializers.URLField(source="get_relative_api_url")
     absolute_url = serializers.SerializerMethodField()
+    # category = serializers.SlugRelatedField(
+    #     many=False, slug_field="name", queryset=Category.objects.all()
+    # )
+    # category = CategorySerializer()
 
     class Meta:
         model = Post
@@ -23,6 +34,7 @@ class PostSerializer(serializers.ModelSerializer):
             "snippet",
             "relative_url",
             "absolute_url",
+            "category",
             "published",
             "published_date",
             "created_date",
@@ -33,10 +45,3 @@ class PostSerializer(serializers.ModelSerializer):
     def get_absolute_url(self, obj):
         request = self.context.get("request")
         return request.build_absolute_uri(obj.pk)
-
-
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        # don't use __all__ for fields (best practice)
-        fields = ["id", "name"]
