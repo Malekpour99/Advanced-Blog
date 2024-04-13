@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 # To get User model object: use USER_AUTH_MODEL from settings
 # or import User model directly from accounts app
 # but below way is more efficient since it's more dynamic
-User = get_user_model()
+# User = get_user_model()
 
 
 # Create your models here.
@@ -14,7 +14,7 @@ class Post(models.Model):
     This is a class for defining posts in the blog app
     """
 
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.ForeignKey("accounts.Profile", on_delete=models.CASCADE)
     image = models.ImageField(upload_to="blog/", null=True, blank=True)
     title = models.CharField(max_length=255)
     content = models.TextField()
