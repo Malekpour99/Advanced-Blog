@@ -19,6 +19,7 @@ from blog.models import Post, Category
 from .serializers import PostSerializer, CategorySerializer
 from rest_framework import status
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 # Function Based Views --------------------------------
@@ -268,6 +269,8 @@ class PostModelViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
     serializer_class = PostSerializer
     queryset = Post.objects.filter(published=True)
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['category', 'author']
 
     @action(methods=["get"], detail=False)
     def get_ok(self, request):
