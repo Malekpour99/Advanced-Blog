@@ -20,7 +20,7 @@ from .serializers import PostSerializer, CategorySerializer
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.filters import SearchFilter
+from rest_framework.filters import SearchFilter, OrderingFilter
 
 
 # Function Based Views --------------------------------
@@ -270,10 +270,11 @@ class PostModelViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
     serializer_class = PostSerializer
     queryset = Post.objects.filter(published=True)
-    filter_backends = [DjangoFilterBackend, SearchFilter]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ["category", "author"]
     search_fields = ["title", "content"]
     # customize search results by prefixing fields with ^ = $ @
+    ordering_fields = ["published_date"]
 
     @action(methods=["get"], detail=False)
     def get_ok(self, request):
