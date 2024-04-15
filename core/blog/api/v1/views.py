@@ -17,6 +17,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from blog.models import Post, Category
 from .serializers import PostSerializer, CategorySerializer
+from .paginations import DefaultPagination
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -275,6 +276,7 @@ class PostModelViewSet(viewsets.ModelViewSet):
     search_fields = ["title", "content"]
     # customize search results by prefixing fields with ^ = $ @
     ordering_fields = ["published_date"]
+    pagination_class = DefaultPagination
 
     @action(methods=["get"], detail=False)
     def get_ok(self, request):
