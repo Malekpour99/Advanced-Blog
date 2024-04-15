@@ -272,7 +272,10 @@ class PostModelViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
     queryset = Post.objects.filter(published=True)
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ["category", "author"]
+    # filterset_fields = ["category", "author"]
+    filterset_fields = {"category": ["exact", "in"], "author": ["exact"]}
+    # You can define a separate class for customization of model fields filtering in filters.py
+    # then import that class and assign it to 'filterset_class' attribute instead of 'filterset_fields'
     search_fields = ["title", "content"]
     # customize search results by prefixing fields with ^ = $ @
     ordering_fields = ["published_date"]
