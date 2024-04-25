@@ -6,6 +6,7 @@ from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class UserRegistration(GenericAPIView):
@@ -43,5 +44,10 @@ class CustomDiscardAuthToken(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        request.user.auth_token.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        try:
+            request.user.auth_token.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except ObjectDoesNotExist:
+            return Response(
+                {"detail": "Token does not exist"}, status=status.HTTP_404_NOT_FOUND
+            )
