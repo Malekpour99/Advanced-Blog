@@ -6,6 +6,7 @@ app_name = "api-v1"
 
 urlpatterns = [
     path("registration/", views.UserRegistration.as_view(), name="registration"),
+    path("change-password/", views.ChangePasswordAPIView.as_view(), name="change-password"),
     path("token/login/", views.CustomObtainAuthToken.as_view(), name="token-login"),
     path("token/logout/", views.CustomDiscardAuthToken.as_view(), name="token-logout"),
     path("jwt/create/", views.CustomTokenObtainPairView.as_view(), name="jwt-create"),
