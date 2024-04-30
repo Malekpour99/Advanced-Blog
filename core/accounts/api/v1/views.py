@@ -4,9 +4,10 @@ from .serializers import (
     CustomAuthTokenSerializer,
     CustomTokenObtainPairSerializer,
     ChangePasswordSerializer,
+    ProfileSerializer,
 )
 from rest_framework import status
-from rest_framework.generics import GenericAPIView
+from rest_framework.generics import GenericAPIView, RetrieveUpdateAPIView
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
@@ -14,6 +15,8 @@ from rest_framework.views import APIView
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth import get_user_model
+from accounts.models import Profile
+from django.shortcuts import get_object_or_404
 
 User = get_user_model()
 
@@ -93,3 +96,15 @@ class ChangePasswordAPIView(GenericAPIView):
                 status=status.HTTP_200_OK,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ProfileAPIView(RetrieveUpdateAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+
+    def get_object(self):
+        # Since we only need one object, we override the get_object method instead of get_queryset
+        queryset = self.get_queryset()
+        obj = get_object_or_404(queryset, user=self.request.user)
+        return obj
