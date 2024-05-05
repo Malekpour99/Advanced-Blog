@@ -39,11 +39,24 @@ class UserRegistration(GenericAPIView):
         # we can still use raise_exception=True but we tried another way for educational purposes
         if serializer.is_valid():
             serializer.save()
+            email = serializer.validated_data["email"]
             # Prevention of receiving hashed password in the serializer.data
-            data = {"email": serializer.validated_data["email"]}
+            data = {"email": email}
+            user_obj = get_object_or_404(User, email=email)
+            token = self.get_tokens_for_user(user_obj)
+            email_obj = EmailMessage(
+                "email/activation-email.tpl", {"token": token}, "admin@admin.com", to=[email]
+            )
+            EmailThread(email_obj).start()
             return Response(data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+
+    def get_tokens_for_user(self, user):
+        """Return an access token based on the user"""
+        refresh = RefreshToken.for_user(user)
+        return str(refresh.access_token)
 
 
 class CustomObtainAuthToken(ObtainAuthToken):
