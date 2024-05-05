@@ -14,6 +14,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
 from accounts.models import Profile
 from django.shortcuts import get_object_or_404
@@ -118,8 +119,17 @@ class ProfileAPIView(RetrieveUpdateAPIView):
 
 class EmailTest(GenericAPIView):
     def get(self, request, *args, **kwargs):
+        """Sending an email containing the access token based on the user email"""
+        self.email = "user@mail.com"
+        user_obj = get_object_or_404(User, email=self.email)
+        token = self.get_tokens_for_user(user_obj)
         email_obj = EmailMessage(
-            "email/hello.tpl", {"name": "User"}, "admin@admin.com", to=["user@mail.com"]
+            "email/hello.tpl", {"token": token}, "admin@admin.com", to=[self.email]
         )
         EmailThread(email_obj).start()
         return Response("Email was sent successfully")
+
+    def get_tokens_for_user(self, user):
+        """Return an access token based on the user"""
+        refresh = RefreshToken.for_user(user)
+        return str(refresh.access_token)
