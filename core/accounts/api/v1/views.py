@@ -22,6 +22,8 @@ from mail_templated import EmailMessage
 from ..utils import EmailThread
 import jwt
 from django.conf import settings
+from django.contrib.sites.shortcuts import get_current_site
+
 
 # from mail_templated import send_mail
 # from django.core.mail import send_mail
@@ -46,9 +48,13 @@ class UserRegistration(GenericAPIView):
             data = {"email": email}
             user_obj = get_object_or_404(User, email=email)
             token = self.get_tokens_for_user(user_obj)
+            # getting base URL path info for email links
+            current_site = get_current_site(request)
+            protocol = "http" if request.is_secure() else "https"
+            domain = current_site.domain
             email_obj = EmailMessage(
                 "email/activation-email.tpl",
-                {"token": token},
+                {"protocol": protocol, "domain": domain, "token": token},
                 "admin@admin.com",
                 to=[email],
             )
@@ -81,10 +87,12 @@ class ActivationAPIView(APIView):
             )
         user_obj = User.objects.get(pk=user_id)
         if user_obj.is_verified:
-            return Response({"details":"Your account has already been verified and is active"})
+            return Response(
+                {"details": "Your account has already been verified and is active"}
+            )
         user_obj.is_verified = True
         user_obj.save()
-        return Response({"details":"Your account has been verified and activated"})
+        return Response({"details": "Your account has been verified and activated"})
 
 
 class CustomObtainAuthToken(ObtainAuthToken):
