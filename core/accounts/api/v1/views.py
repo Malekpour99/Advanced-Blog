@@ -20,7 +20,8 @@ from accounts.models import Profile
 from django.shortcuts import get_object_or_404
 from mail_templated import EmailMessage
 from ..utils import EmailThread
-
+import jwt
+from django.conf import settings
 
 # from mail_templated import send_mail
 # from django.core.mail import send_mail
@@ -60,6 +61,30 @@ class UserRegistration(GenericAPIView):
         """Return an access token based on the user"""
         refresh = RefreshToken.for_user(user)
         return str(refresh.access_token)
+
+
+class ActivationAPIView(APIView):
+    """Decoding JWT authentication token and activating user"""
+
+    def get(self, request, token, *args, **kwargs):
+        try:
+            token = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
+            user_id = token.get("user_id", None)
+        except jwt.exceptions.ExpiredSignatureError:
+            return Response(
+                {"details": "Token has been expired"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except jwt.exceptions.InvalidSignatureError:
+            return Response(
+                {"details": "Token is not valid"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        user_obj = User.objects.get(pk=user_id)
+        if user_obj.is_verified:
+            return Response({"details":"Your account has already been verified and is active"})
+        user_obj.is_verified = True
+        user_obj.save()
+        return Response({"details":"Your account has been verified and activated"})
 
 
 class CustomObtainAuthToken(ObtainAuthToken):
