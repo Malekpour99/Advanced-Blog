@@ -1,9 +1,10 @@
 {% extends "mail_templated/base.tpl" %}
 
 {% block subject %}
-Hello {{ name }}
+Account Activation
 {% endblock %}
 
 {% block html %}
-This is an <strong>html</strong> message.
+Please click on the link below to activate your account:
+{{ token }}
 {% endblock %}
