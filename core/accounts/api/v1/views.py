@@ -21,6 +21,7 @@ from django.shortcuts import get_object_or_404
 from mail_templated import EmailMessage
 from ..utils import EmailThread
 
+
 # from mail_templated import send_mail
 # from django.core.mail import send_mail
 
@@ -45,13 +46,15 @@ class UserRegistration(GenericAPIView):
             user_obj = get_object_or_404(User, email=email)
             token = self.get_tokens_for_user(user_obj)
             email_obj = EmailMessage(
-                "email/activation-email.tpl", {"token": token}, "admin@admin.com", to=[email]
+                "email/activation-email.tpl",
+                {"token": token},
+                "admin@admin.com",
+                to=[email],
             )
             EmailThread(email_obj).start()
             return Response(data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
 
     def get_tokens_for_user(self, user):
         """Return an access token based on the user"""
