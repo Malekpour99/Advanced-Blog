@@ -5,6 +5,7 @@ from .serializers import (
     CustomTokenObtainPairSerializer,
     ChangePasswordSerializer,
     ProfileSerializer,
+    ActivationResendSerializer,
 )
 from rest_framework import status
 from rest_framework.generics import GenericAPIView, RetrieveUpdateAPIView
@@ -50,7 +51,7 @@ class UserRegistration(GenericAPIView):
             token = self.get_tokens_for_user(user_obj)
             # getting base URL path info for email links
             current_site = get_current_site(request)
-            protocol = "http" if request.is_secure() else "https"
+            protocol = "https" if request.is_secure() else "http"
             domain = current_site.domain
             email_obj = EmailMessage(
                 "email/activation-email.tpl",
@@ -93,6 +94,38 @@ class ActivationAPIView(APIView):
         user_obj.is_verified = True
         user_obj.save()
         return Response({"details": "Your account has been verified and activated"})
+
+
+class ActivationResendAPIView(GenericAPIView):
+    """Resending JWT authentication token for user activation"""
+
+    serializer_class = ActivationResendSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user_obj = serializer.validated_data["user"]
+        token = self.get_tokens_for_user(user_obj)
+        # getting base URL path info for email links
+        current_site = get_current_site(request)
+        protocol = "https" if request.is_secure() else "http"
+        domain = current_site.domain
+        email_obj = EmailMessage(
+            "email/activation-email.tpl",
+            {"protocol": protocol, "domain": domain, "token": token},
+            "admin@admin.com",
+            to=[user_obj.email],
+        )
+        EmailThread(email_obj).start()
+        return Response(
+            {"details": "Activation link resent was successful"},
+            status=status.HTTP_200_OK,
+        )
+
+    def get_tokens_for_user(self, user):
+        """Return an access token based on the user"""
+        refresh = RefreshToken.for_user(user)
+        return str(refresh.access_token)
 
 
 class CustomObtainAuthToken(ObtainAuthToken):
