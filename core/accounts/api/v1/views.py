@@ -48,18 +48,7 @@ class UserRegistration(GenericAPIView):
             # Prevention of receiving hashed password in the serializer.data
             data = {"email": email}
             user_obj = get_object_or_404(User, email=email)
-            token = self.get_tokens_for_user(user_obj)
-            # getting base URL path info for email links
-            current_site = get_current_site(request)
-            protocol = "https" if request.is_secure() else "http"
-            domain = current_site.domain
-            email_obj = EmailMessage(
-                "email/activation-email.tpl",
-                {"protocol": protocol, "domain": domain, "token": token},
-                "admin@admin.com",
-                to=[email],
-            )
-            EmailThread(email_obj).start()
+            ActivationEmailSender.send_activation_email(request, user_obj)
             return Response(data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -105,27 +94,11 @@ class ActivationResendAPIView(GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         user_obj = serializer.validated_data["user"]
-        token = self.get_tokens_for_user(user_obj)
-        # getting base URL path info for email links
-        current_site = get_current_site(request)
-        protocol = "https" if request.is_secure() else "http"
-        domain = current_site.domain
-        email_obj = EmailMessage(
-            "email/activation-email.tpl",
-            {"protocol": protocol, "domain": domain, "token": token},
-            "admin@admin.com",
-            to=[user_obj.email],
-        )
-        EmailThread(email_obj).start()
+        ActivationEmailSender.send_activation_email(request, user_obj)
         return Response(
             {"details": "Activation link resent was successful"},
             status=status.HTTP_200_OK,
         )
-
-    def get_tokens_for_user(self, user):
-        """Return an access token based on the user"""
-        refresh = RefreshToken.for_user(user)
-        return str(refresh.access_token)
 
 
 class CustomObtainAuthToken(ObtainAuthToken):
@@ -212,6 +185,29 @@ class EmailTest(GenericAPIView):
         return Response("Email was sent successfully")
 
     def get_tokens_for_user(self, user):
+        """Return an access token based on the user"""
+        refresh = RefreshToken.for_user(user)
+        return str(refresh.access_token)
+
+
+class ActivationEmailSender:
+    @staticmethod
+    def send_activation_email(request, user):
+        """Send activation email to the user"""
+        token = ActivationEmailSender.get_tokens_for_user(user)
+        current_site = get_current_site(request)
+        protocol = "https" if request.is_secure() else "http"
+        domain = current_site.domain
+        email_obj = EmailMessage(
+            "email/activation-email.tpl",
+            {"protocol": protocol, "domain": domain, "token": token},
+            "admin@admin.com",
+            to=[user.email],
+        )
+        EmailThread(email_obj).start()
+
+    @staticmethod
+    def get_tokens_for_user(user):
         """Return an access token based on the user"""
         refresh = RefreshToken.for_user(user)
         return str(refresh.access_token)
