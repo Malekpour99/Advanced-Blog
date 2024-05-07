@@ -53,11 +53,6 @@ class UserRegistration(GenericAPIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def get_tokens_for_user(self, user):
-        """Return an access token based on the user"""
-        refresh = RefreshToken.for_user(user)
-        return str(refresh.access_token)
-
 
 class ActivationAPIView(APIView):
     """Decoding JWT authentication token and activating user"""
