@@ -11,3 +11,5 @@ drf-yasg[validation]
 djangorestframework-simplejwt
 # Email
 django-mail-templated
+# Refactor & Test
+black
