@@ -9,8 +9,12 @@ markdown
 django-filter
 drf-yasg[validation]
 djangorestframework-simplejwt
+
 # Email
 django-mail-templated
+
 # Refactor & Test
 black
 flake8
+pytest
+pytest-django
