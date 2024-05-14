@@ -4,17 +4,22 @@ import pytest
 from datetime import datetime
 
 
+@pytest.fixture
+def api_client():
+    client = APIClient()
+    return client
+
+
 # Giving access to database
 @pytest.mark.django_db
 class TestPostAPI:
-    client = APIClient()
 
-    def test_get_post_response_200_status(self):
+    def test_get_post_response_200_status(self, api_client):
         url = reverse("blog:api-v1:post-list")
-        response = self.client.get(url)
+        response = api_client.get(url)
         assert response.status_code == 200
 
-    def test_create_post_response_401_status(self):
+    def test_create_post_response_401_status(self, api_client):
         url = reverse("blog:api-v1:post-list")
         data = {
             "title": "test title",
@@ -22,5 +27,5 @@ class TestPostAPI:
             "published": True,
             "published_date": datetime.now(),
         }
-        response = self.client.post(url, data, format="json")
+        response = api_client.post(url, data, format="json")
         assert response.status_code == 401
