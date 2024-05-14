@@ -1,5 +1,6 @@
-from rest_framework.test import APIClient
+from django.contrib.auth import get_user_model
 from django.urls import reverse
+from rest_framework.test import APIClient
 import pytest
 from datetime import datetime
 
@@ -8,6 +9,14 @@ from datetime import datetime
 def api_client():
     client = APIClient()
     return client
+
+
+@pytest.fixture
+def common_user():
+    user = get_user_model().objects.create_user(
+        email="user@mail.com", password="commonPassword", is_verified=True
+    )
+    return user
 
 
 # Giving access to database
