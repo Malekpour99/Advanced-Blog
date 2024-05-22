@@ -21,7 +21,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config("SECRET_KEY", default="django-insecure-q7r1r^3_#xp2sp+p=tyn=$s=7!s-i3v%q902b9h@ha64&gk8u&")
+SECRET_KEY = config(
+    "SECRET_KEY",
+    default="django-insecure-q7r1r^3_#xp2sp+p=tyn=$s=7!s-i3v%q902b9h@ha64&gk8u&",
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", cast=bool, default=True)
@@ -168,3 +171,7 @@ EMAIL_PORT = 25
 EMAIL_USE_TLS = False
 EMAIL_HOST_USER = ""
 EMAIL_HOST_PASSWORD = ""
+
+# Celery Configuration
+# service://service-domain(container-name):service-port/database
+CELERY_BROKER_URL = "redis://redis:6379/1"
