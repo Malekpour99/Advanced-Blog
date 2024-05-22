@@ -1,4 +1,14 @@
 services:
+  redis:
+    container_name: redis
+    image: redis
+    ports:
+      - mode: ingress
+        target: 6379
+        published: 6379
+        protocol: tcp
+    # to see redis logs
+    command: redis-server --save 60 1 --loglevel warning
   backend:
     build: .
     container_name: backend
@@ -19,7 +29,6 @@ services:
       DEBUG: True
   smtp4dev:
     image: rnwood/smtp4dev:v3
-    restart: always
     ports:
       # Change the number before : to the port the web interface should be accessible on
       - '5000:80'
